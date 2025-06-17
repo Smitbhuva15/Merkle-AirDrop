@@ -5,6 +5,7 @@ import {Test,console} from "forge-std/Test.sol";
 import {MerkleAirdrop} from "../src/MerkleAirdrop.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {BagelToken} from "../src/BagelToken.sol";
+import {DeployMerkle} from "../script/DeployMerkle.s.sol";
 
 contract MerkleAirdropTest is Test {
     MerkleAirdrop private airdrop;
@@ -23,11 +24,9 @@ contract MerkleAirdropTest is Test {
 
 
     function setup() internal{ 
-        token=new BagelToken();
-        airdrop=new MerkleAirdrop(
-            ROOT,
-            IERC20(token)
-        );
+        DeployMerkle deployMerkle = new DeployMerkle();
+        (token, airdrop) = deployMerkle.run(); // Deploy the airdrop contract and token
+
         token.mint(address(airdrop), AMOUNT_CONTRACT); // Mint tokens to the airdrop contract
     }
 
