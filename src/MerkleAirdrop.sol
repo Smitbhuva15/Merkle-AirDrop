@@ -13,10 +13,14 @@ contract MerkleAirdrop {
 
     using SafeERC20 for IERC20;
 
+    //////////////////////      mapping      //////////////////////
+
+    mapping(address => bool) public hasClaimed;
 
     //////////////////////      errors         //////////////////////
 
     error MerkleAirdrop__InvalidProof();
+    error MerkleAirdrop__AlreadyClaimed();
 
     /////////////////////      events         //////////////////////
 
@@ -28,16 +32,37 @@ contract MerkleAirdrop {
     }
 
     function claim(address account,uint256 amount,bytes32[] calldata merkleProof) external{
+     if(hasClaimed[account]) {
+            revert MerkleAirdrop__AlreadyClaimed();
+        }
+
         // calculate the leaf node hash with the account and amount
+
+        // two times keccak256 is used to ensure that the leaf node is unique
+        // and to prevent any potential collisions
+        // first keccak256 hashes the account and amount
+        // second keccak256 hashes the result of the first keccak256
+        // this is a common pattern in Merkle trees to ensure uniqueness
+        // and to prevent any potential collisions
+        // the leaf node is a hash of the account address and the amount
         bytes32 leaf = keccak256(bytes.concat(keccak256(abi.encode(account, amount))));
 
         if(!MerkleProof.verify(merkleProof, i_merkleRoot, leaf)) {
             revert MerkleAirdrop__InvalidProof();
         }
+        // mark the account as claimed
+        hasClaimed[account] = true;
  
         // transfer the tokens to the account
         emit Claimed(account, amount);
         i_airDropToken.safeTransfer(account, amount);
+    }
+
+    function getMerkleRoot() external view returns (bytes32) {
+        return i_merkleRoot;
+    }
+    function getAirDropToken() external view returns (IERC20) {
+        return i_airDropToken;
     }
 
 
