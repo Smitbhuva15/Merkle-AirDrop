@@ -10,7 +10,8 @@ import {DeployMerkle} from "../script/DeployMerkle.s.sol";
 contract MerkleAirdropScript is Test {
     MerkleAirdrop private airdrop;
     BagelToken private token;
-    address USER=makeAddr("USER"); 
+    address USER;
+    address GASPAYER;
     uint256 USERPRIVATEKEY;
 
     bytes32 PROOF1=0x9e10faf86d92c4c65f81ac54ef2a27cc0fdf6bfea6ba4b1df5955e47f187115b;
@@ -27,15 +28,25 @@ contract MerkleAirdropScript is Test {
         (token, airdrop) = deployMerkle.run(); // Deploy the airdrop contract and token
 
         token.mint(address(airdrop), AMOUNT_CONTRACT); // Mint tokens to the airdrop contract
-    
-
+        (USER,USERPRIVATEKEY) = makeAddrAndKey("user"); // Create a user address and private key
+        GASPAYER = makeAddr("gasPayer"); // Create a gas payer address
     }
 
     function testclaim() public {
-        console.log("Claiming airdrop for user:", USER);
-
+        uint256 startingBalance = token.balanceOf(USER);
+  
         vm.startPrank(USER);
-        airdrop.claim(USER, AMOUNT, PROOF);
+       bytes32 messageHash = airdrop.getMessageHash(USER, AMOUNT);
+       (uint8 v, bytes32 r, bytes32 s) = vm.sign(USERPRIVATEKEY, messageHash);
+        vm.stopPrank();
+
+
+
+        vm.startPrank(GASPAYER); // Start a prank as the gas payer
+        airdrop.claim(USER, AMOUNT, PROOF, v, r, s); // User claims the airdrop
+        vm.stopPrank();
+
+        uint256 endingBalance = token.balanceOf(USER);
         vm.stopPrank();
 
     }
