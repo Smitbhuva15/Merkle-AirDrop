@@ -16,7 +16,7 @@ contract GenerateInput is Script {
         uint256 amount = 2500 * 1e18; // Example amount
 
         address[] memory whitelist = new address[](4);
-        whitelist[0] =  0x6CA6d1e2D5347Bfab1d91e883F1915560e09129D;
+        whitelist[0] =  0xF921F4FA82620d8D2589971798c51aeD0C02c81a;
         whitelist[1] = 0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B; // Example addresses
         whitelist[2] = 0x1Db3439a222C519ab44bb1144fC28167b4Fa6EE6;
         whitelist[3] = 0x2E466e7519a469F20168796A0807B758A2339791;
