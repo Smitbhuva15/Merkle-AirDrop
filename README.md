@@ -32,6 +32,7 @@
     - When someone claims an airdrop, they provide a Merkle Proof (like a path of hashes).
 
     - The contract uses the proof to verify that user is in the tree without seeing the full list.
+    
  
 ### Claim Function
 
