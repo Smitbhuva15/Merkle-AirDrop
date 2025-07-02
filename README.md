@@ -33,6 +33,8 @@
 
     - The contract uses the proof to verify that user is in the tree without seeing the full list.
     
+
+    
  
 ### Claim Function
 
